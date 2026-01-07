@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demands-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demands-api
+  template:
+    metadata:
+      labels:
+        app: demands-api
+    spec:
+      containers:
+        - name: api
+          image: demands-api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: uri
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
